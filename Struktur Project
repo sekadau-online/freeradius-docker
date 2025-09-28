@@ -1,0 +1,9 @@
+freeradius-docker/
+│── docker-compose.yml
+│── freeradius/
+│    ├── Dockerfile
+│    └── mods-config/
+│         └── sql/
+│              └── main/
+│                   └── mysql/
+│                        └── schema.sql

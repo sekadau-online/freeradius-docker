@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: radius_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: radius
+      MYSQL_USER: radius
+      MYSQL_PASSWORD: radiuspass
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./freeradius/mods-config/sql/main/mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - radius_net
+
+  freeradius:
+    build: ./freeradius
+    container_name: freeradius_srv
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: radius
+      DB_PASS: radiuspass
+      DB_NAME: radius
+    ports:
+      - "1812:1812/udp"  # Authentication
+      - "1813:1813/udp"  # Accounting
+    networks:
+      - radius_net
+    volumes:
+      - ./freeradius:/etc/freeradius
+
+networks:
+  radius_net:
+    driver: bridge
